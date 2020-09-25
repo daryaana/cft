@@ -31,7 +31,7 @@ public class DataFile {
 
     public void addDF(Car car) throws IOException {
         allCars.put(countLines(),car);
-        saveTxt();
+        save();
 
 
     }
@@ -78,7 +78,15 @@ public class DataFile {
     }
 
     public void saveTxt() {
+        try(FileWriter fileWriter= new FileWriter(file);) {
+            BufferedWriter out =new BufferedWriter(fileWriter);
+            out.write("");
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+
             for (Map.Entry<Integer, Car> item : allCars.entrySet()) {
                 int id = (int) item.getKey();
                 Car car = item.getValue();
@@ -86,6 +94,16 @@ public class DataFile {
             }
     //        loadDB();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void save(){
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            Car car = allCars.get(countLines());
+            writer.write( countLines()+ " " + car.getProducer() + " " + car.getModel() + " " + car.getTypeOfBody() + " " + car.getAge() + "\n");
+            }
+            //        loadDB();
+         catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -101,6 +119,7 @@ public class DataFile {
 
 
     public void changeCar(int id, String strProducer, String strModel, String strBodyType, String strAge) {
+        loadDB();
         for (Map.Entry<Integer, Car> item : allCars.entrySet()) {
             if (item.getKey() == id) {
                 allCars.put(id, new Car(strProducer, strModel, strBodyType, strAge));

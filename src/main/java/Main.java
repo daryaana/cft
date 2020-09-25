@@ -25,19 +25,24 @@ public class Main {
         enter = in.next();
         Command command = new Command();
         command.firstStart();
-        while (!enter.equals(EXIT)) {
+        while (true) {
+            enter = in.next();
             switch (enter) {
                 case SHOW_ALL:
                     command.show();
+                    System.out.print("Input a number: ");
                     break;
                 case ADD:
                     command.add();
+                    System.out.print("Input a number: ");
                     break;
                 case DELETE:
                     command.delete();
+                    System.out.print("Input a number: ");
                     break;
                 case CHANGE:
                     command.change();
+                    System.out.print("Input a number: ");
                     break;
                 default:
                     System.out.println("Вы ввели недопустимые символы");

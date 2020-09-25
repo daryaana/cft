@@ -23,6 +23,7 @@ public class Command {
     }
 
     public void add() throws IOException {
+        datafile.loadDB();
         Scanner in2 = new Scanner(System.in);
         System.out.println("Введите Марку: ");
         String strProducer = in2.nextLine();
@@ -34,14 +35,15 @@ public class Command {
         String strAge = in2.next();
         Car car = new Car(strProducer, strModel, strBodyType, strAge);
         datafile.addDF(car);
-        datafile.saveWithoutLoad(car);
     }
 
     public void show() throws IOException {
+      //  datafile.loadDB();
         datafile.showBD();
     }
 
     public void delete() {
+        datafile.loadDB();
         System.out.println("Введите номер автомобиля, который хотите удалить");
         Scanner in = new Scanner(System.in);
         int id = Integer.valueOf(in.nextLine());
@@ -49,6 +51,7 @@ public class Command {
     }
 
     public void change() {
+        datafile.loadDB();
         System.out.println("Введите номер автомобиля, данные которого хотите изменить");
         Scanner in = new Scanner(System.in);
         int id = Integer.valueOf(in.nextLine());

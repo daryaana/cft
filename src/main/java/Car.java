@@ -5,8 +5,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Car implements Serializable {
-    private static AtomicInteger nextID = new AtomicInteger(0);
-
 
     private int id;
     private String producer; // производитель
@@ -25,7 +23,6 @@ public class Car implements Serializable {
     }
 
     public Car(String producer, String model, String typeOfBody, String age) {
-        this.id = nextID.get();
         this.producer = producer;
         this.model = model;
         this.typeOfBody = typeOfBody;
