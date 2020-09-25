@@ -1,71 +1,51 @@
 import java.io.*;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    public static boolean firstStart;
-static String menu = new String("Enter 1 to see all cars.\n" +
-        "Enter 2 to add one of cars. \n" +
-        "Enter 3 to delete one of cars. \n" +
-        "Enter 4 to change one of car\n"+
-        "Enter 5 to exit\n");
+    static String menu = "Enter 1 to see all cars.\n" +
+            "Enter 2 to add one of cars. \n" +
+            "Enter 3 to delete one of cars. \n" +
+            "Enter 4 to change one of car\n" +
+            "Enter 5 to exit\n";
+    static final String SHOW_ALL = "1";
+    static final String ADD = "2";
+    static final String DELETE = "3";
+    static final String CHANGE = "4";
+    static final String EXIT = "5";
+
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-
-        int carId=countLines("db.txt");
-
-        //   Map<Integer, Car> carsMap = new HashMap<Integer, Car>();
         System.out.println("Hello! It's list of cars. \n");
-        System.out.println(menu);/*
-                "Enter 1 to see all cars.\n" +
-                "Enter 2 to add one of cars. \n" +
-                "Enter 3 to delete one of cars. \n" +
-                "Enter 4 to change one of cars");*/
-
-        Command command = new Command();
-    /*    if(firstStart){
-            createExample(command);
-        }*/
-        //command.firstStart();
-
+        System.out.println(menu);
+        String enter = null;
         Scanner in = new Scanner(System.in);
         System.out.print("Input a number: ");
-        int num = in.nextInt();
-        if (num == 1) {
-            command.firstStart();
-            command.showAllCar();
-            System.out.println(menu);
-
+        enter = in.next();
+        Command command = new Command();
+        command.firstStart();
+        while (!enter.equals(EXIT)) {
+            switch (enter) {
+                case SHOW_ALL:
+                    command.show();
+                    break;
+                case ADD:
+                    command.add();
+                    break;
+                case DELETE:
+                    command.delete();
+                    break;
+                case CHANGE:
+                    command.change();
+                    break;
+                default:
+                    System.out.println("Вы ввели недопустимые символы");
+                    break;
+            }
         }
-        //   in.close();
-        if (num == 2) {
-            Scanner in2 = new Scanner(System.in);
-            System.out.println("Введите Марку: ");
 
-            String strProducer = in2.nextLine();
-            System.out.println("Введите Модель:");
-            String strModel = in2.next();
-            System.out.println("Введите Тип Кузова:");
-            String strBodyType = in2.next();
-            System.out.println("Введите год выпуска:");
-            String strAge = in2.next();
-            String[] argum = {Integer.toString(carId), strProducer, strModel, strBodyType, strAge};
-            carId++;
-            Map<String, String> params = new Main().parse(argum);
-            command.add(params);
-            System.out.println(menu);
-            //   fromSerialize(toSerialize(carsMap));
-            // System.out.println("1");
-        }
-        if(num == 3){
-            System.out.println("Введите номер автомобиля, который хотите удалить");
-            Scanner in3 = new Scanner(System.in);
-            String number=in3.nextLine();
-            command.delete(number);
 
-        }
 
 
         //Сериализация с помощью класса ByteArrayOutputStream
@@ -110,7 +90,7 @@ static String menu = new String("Enter 1 to see all cars.\n" +
         objectOutputStream2.close();
     }*/
     public Map<String, String> parse(String[] args) {
-        String[] key = {"id","producer", "model", "typeOfBody", "age"};
+        String[] key = {"id", "producer", "model", "typeOfBody", "age"};
         Map<String, String> parameters = new HashMap<>();
         for (int i = 0; i < args.length; i += 1) {
             parameters.put(key[i], args[i]);
@@ -118,36 +98,6 @@ static String menu = new String("Enter 1 to see all cars.\n" +
         return parameters;
     }
 
-    public static void createExample(Command command) {
-        firstStart = false;
-        String[] example0 = {"1","Mazda", "mazda6", "sedan", "2005"};
-        String[] example1 = {"2","Lexus", "is250", "sedan", "2015"};
-        String[] example2 = {"3","Toyota", "Camry", "sedan", "2019"};
-        Map<String, String> ex0 = new Main().parse(example0);
-        Map<String, String> ex1 = new Main().parse(example1);
-        Map<String, String> ex2 = new Main().parse(example2);
-        command.add(ex0);
-        command.add(ex1);
-        command.add(ex2);
-    }
-    public static int countLines(String filename) throws IOException {
-        InputStream is = new BufferedInputStream(new FileInputStream(filename));
-        try {
-            byte[] c = new byte[1024];
-            int count = 0;
-            int readChars = 0;
-            boolean empty = true;
-            while ((readChars = is.read(c)) != -1) {
-                empty = false;
-                for (int i = 0; i < readChars; ++i) {
-                    if (c[i] == '\n') {
-                        ++count;
-                    }
-                }
-            }
-            return (count == 0 && !empty) ? 1 : count;
-        } finally {
-            is.close();
-        }
-    }
+
+
 }

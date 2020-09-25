@@ -1,35 +1,51 @@
-import com.google.gson.Gson;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataFile {
+    private Map<Integer, Car> allCars = new HashMap<Integer, Car>();//список всех машин с id- key
     private File file;
-    //private
-    // private List<Car> cars = new ArrayList<>();
-    private Map<Integer, Car> cars = new HashMap<Integer, Car>();
-    private static AtomicInteger nextID = new AtomicInteger(0);
 
     public DataFile(String fileName) {
         this.file = new File(fileName);
     }
 
-    public int countOfcars() {
-        return cars.size();
-    }
-
-    public void save(Car car) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            writer.write(car.getId() + " " + car.getProducer() + " " + car.getModel() + " " + car.getTypeOfBody() + " " + car.getAge() + "\n");
+    /**
+     * TO DO
+     * загружать бд каждую опрецию и при запуске программы
+     */
+    public void loadDB() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            int id = 1;
+            while ((line = reader.readLine()) != null) {
+                String[] split = line.split(" ");
+                Car car = new Car(split[0], split[1], split[2], split[3], split[4]);
+                allCars.put(id, car);
+                reader.readLine();
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e + "A new file db.txt will be created\n");
         }
-        loadInFileConsole();
-        writeToJson();
     }
 
+    public void addDF(Car car) throws IOException {
+        allCars.put(countLines(),car);
+        saveTxt();
+
+
+    }
+
+
+    /*  public void save(Car car) {
+          try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+              writer.write(car.getId() + " " + car.getProducer() + " " + car.getModel() + " " + car.getTypeOfBody() + " " + car.getAge() + "\n");
+          } catch (IOException e) {
+              throw new RuntimeException(e);
+          }
+          loadInFileConsole();
+      }
+  */
     public void saveWithoutLoad(Car car) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             writer.write(car.getId() + " " + car.getProducer() + " " + car.getModel() + " " + car.getTypeOfBody() + " " + car.getAge() + "\n");
@@ -40,16 +56,9 @@ public class DataFile {
 
     }
 
-    public void deleteFromFile(int id) {
-        Map<Integer, Car> copy = new HashMap<>(cars);
-        cars.remove(id);
-  /*      for(Map.Entry<Integer, Car> pair: copy.entrySet()){
-            if (pair.getValue().equals(Integer.toString(id))){
-                cars.remove(pair.getKey());
-            }
-            loadInFile();
-        }*/
-        loadInFile();
+    public void deleteCar(int id) {
+        allCars.remove(id);
+        saveTxt();
 
     }
 
@@ -60,7 +69,7 @@ public class DataFile {
                 //   String[] args = reader.readLine().split(" ");
                 String[] split = carAttrib.split(" ");
                 Car car = new Car(split[0], split[1], split[2], split[3]/*,split[4]*/);
-                cars.put(nextID.getAndIncrement(), car);//cars.add(car);
+                //  allCars.put(nextID.getAndIncrement(), car);//cars.add(car);
                 reader.readLine();
             }
         } catch (IOException e) {
@@ -68,18 +77,20 @@ public class DataFile {
         }
     }
 
-    private void loadInFile() {
+    public void saveTxt() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            for (int i = 0; i < cars.size(); i++) {
-                Car car = cars.get(i);
-                writer.write(car.getId() + " " + car.getProducer() + " " + car.getModel() + " " + car.getTypeOfBody() + " " + car.getAge() + "\n");
+            for (Map.Entry<Integer, Car> item : allCars.entrySet()) {
+                int id = (int) item.getKey();
+                Car car = item.getValue();
+                writer.write(id + " " + car.getProducer() + " " + car.getModel() + " " + car.getTypeOfBody() + " " + car.getAge() + "\n");
             }
+    //        loadDB();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void loadFromFile() throws IOException {
+    public void showBD() throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(file));
         String line = in.readLine();
         while (line != null) {
@@ -88,14 +99,33 @@ public class DataFile {
         }
     }
 
-    private void writeToJson() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data_file.json"))) {
-            Gson gson = new Gson();
-            bw.write(gson.toJson(cars));
-            bw.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+    public void changeCar(int id, String strProducer, String strModel, String strBodyType, String strAge) {
+        for (Map.Entry<Integer, Car> item : allCars.entrySet()) {
+            if (item.getKey() == id) {
+                allCars.put(id, new Car(strProducer, strModel, strBodyType, strAge));
+            }
+        }
+        saveTxt();
+    }
+    public static int countLines() throws IOException {
+        InputStream is = new BufferedInputStream(new FileInputStream("db.txt"));
+        try {
+            byte[] c = new byte[1024];
+            int count = 0;
+            int readChars = 0;
+            boolean empty = true;
+            while ((readChars = is.read(c)) != -1) {
+                empty = false;
+                for (int i = 0; i < readChars; ++i) {
+                    if (c[i] == '\n') {
+                        ++count;
+                    }
+                }
+            }
+            return (count == 0 && !empty) ? 1 : count;
+        } finally {
+            is.close();
         }
     }
-
 }
